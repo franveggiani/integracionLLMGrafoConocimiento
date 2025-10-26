@@ -5,6 +5,8 @@ from neo4j import GraphDatabase
 from langchain_community.chat_models import ChatOllama
 from langchain.schema import SystemMessage, HumanMessage
 from tabulate import tabulate
+import csv
+import io
 
 load_dotenv()
 
@@ -16,7 +18,7 @@ MODEL      = os.getenv("OLLAMA_MODEL", "llama3:3b-instruct")
 
 # ---- LLM local (Ollama) ----
 # Mantengo el constructor simple; si querés limitar tokens: ChatOllama(model_kwargs={"num_predict": 512})
-llm = ChatOllama(model=MODEL, temperature=0.1)
+llm = ChatOllama(model=MODEL, temperature=0.0)
 
 # ---- Conexión Neo4j ----
 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASS))
@@ -132,10 +134,27 @@ def run_cypher(query: str) -> List[Dict[str, Any]]:
     with driver.session() as s:
         return [dict(r) for r in s.run(query)]
 
+def _rows_to_csv(rows: List[Dict[str, Any]]) -> str:
+    if not rows:
+        return ""
+    buf = io.StringIO()
+    writer = csv.DictWriter(buf, fieldnames=list(rows[0].keys()))
+    writer.writeheader()
+    writer.writerows(rows)
+    return buf.getvalue()
+
 def answer_in_natural_language(question: str, rows: List[Dict[str, Any]]) -> str:
-    table = tabulate(rows, headers="keys", tablefmt="github") if rows else "(sin filas)"
-    sys = SystemMessage(content="Redactá una respuesta breve en español usando EXCLUSIVAMENTE los datos de la tabla dada. Si no hay datos, indicá que no hay resultados.")
-    usr = HumanMessage(content=f"Pregunta: {question}\n\nDatos:\n{table}")
+    n = len(rows)
+    csv_text = _rows_to_csv(rows)
+
+    # recomendación: poné temperature=0.0 al crear ChatOllama
+    sys = SystemMessage(content=(
+        "Redactá una respuesta breve en español usando EXCLUSIVAMENTE los datos de la tabla CSV."
+        " Si conteo_filas > 0, NO digas 'No hay resultados'."
+        " Si conteo_filas = 0, debés decir exactamente: 'No hay resultados.'"
+        " No inventes datos ni columnas."
+    ))
+    usr = HumanMessage(content=f"Pregunta: {question}\nconteo_filas: {n}\n\nCSV:\n{csv_text if csv_text else '(sin filas)'}")
     resp = llm.invoke([sys, usr])
     return resp.content.strip()
 
