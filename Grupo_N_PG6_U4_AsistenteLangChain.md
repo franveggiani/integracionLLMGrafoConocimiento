@@ -1,10 +1,6 @@
-# Grupo N — PG6 U4 — Asistente LangChain (AFPI)
+# Grupo 4 — PG6 U4 — Asistente LangChain (AFPI)
 
-Autor/es: [Completar]
-Categoría / Materia: [Completar]
-Carrera / Institución: [Completar]
-Docente: [Completar]
-Fecha: [Completar]
+Autor/es: [Díaz, Ignacio; Pozzoli, Gonzalo; Manrique, Martín; Veggiani, Franco]
 
 **Resumen**
 Asistente inteligente en español para consultas de finanzas personales (AFPI), basado en un LLM open‑source desplegado con Ollama e integrado con Neo4j mediante LangChain. Traduce preguntas en lenguaje natural a Cypher seguro, ejecuta sobre el grafo, y redacta una respuesta breve consistente con los datos.
@@ -167,11 +163,6 @@ Insertar una de las siguientes (o ambas):
   - Usuario —REALIZA→ Movimiento —PERTENECE_A→ Categoría
   - Usuario —TIENE→ Objetivo
   - Usuario —RECIBE→ Recomendación —BASADO_EN→ Categoría —DIRIGIDA_A→ Objetivo
-
-Ejemplo de placeholder:
-
-![Diagrama del Grafo AFPI](img/grafo-afpi.png)
-
 ---
 
 ## Reflexión grupal sobre resultados y mejoras
