@@ -1,0 +1,40 @@
+Aquí van prompts en lenguaje natural listos para el LLM (AFPI). Incluí el usuario (por nombre o por id user#maria / user#carlos) y, si aplica, rangos de fechas.
+
+Movimientos
+
+Listá los últimos 10 movimientos de user#maria con fecha, tipo, monto y categoría.
+Mostrame los movimientos de María González del mes actual con descripción y monto.
+Filtrá los movimientos de user#carlos entre 2025-10-01 y 2025-10-20.
+¿Cuáles fueron los 5 gastos más altos de user#maria este mes?
+Gastos e Ingresos
+
+¿Cuánto gasté por categoría en los últimos 30 días? (para user#maria)
+Dame el total de ingresos y de gastos del mes pasado para Carlos Rodríguez.
+Top 3 categorías por gasto de user#maria este mes, con totales.
+¿En qué gasté más esta semana? Resumí por categoría para user#carlos.
+Series Temporales
+
+Ingresos y gastos por día de user#maria en octubre 2025.
+Gastos por mes y categoría para Carlos Rodríguez en 2025.
+Evolución semanal del gasto total de user#maria en los últimos 60 días.
+Categorías y Umbrales
+
+Mostrame las categorías de user#maria con su nombre, umbral y nivel de gasto actual.
+¿Qué categorías superaron su umbral para user#carlos en los últimos 30 días?
+Detallá los gastos de la categoría “Supermercado” de user#maria con fecha y monto.
+Objetivos de Ahorro
+
+Listá los objetivos de ahorro de user#maria con meta, progreso y fecha límite.
+¿Cuál es el objetivo más urgente de Carlos Rodríguez y cuánto le falta?
+Ordená los objetivos de user#maria por urgencia y luego por progreso.
+Recomendaciones
+
+Mostrame las recomendaciones activas para user#maria con tipo y descripción.
+Dame solo las recomendaciones de tipo “Alerta” para user#carlos.
+¿En qué categoría se basan las recomendaciones de user#maria y a qué objetivo están dirigidas?
+Resúmenes
+
+Resumen financiero de user#maria: ingresos, gastos, balance actual.
+Resumen por categoría de user#carlos del último mes con totales ordenados desc.
+¿Qué porcentaje de progreso tiene cada objetivo de user#maria?
+Tips rápidos

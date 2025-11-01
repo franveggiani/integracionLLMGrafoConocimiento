@@ -1,5 +1,5 @@
 import os, re
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from dotenv import load_dotenv
 from neo4j import GraphDatabase
 from langchain_community.chat_models import ChatOllama
@@ -7,12 +7,14 @@ from langchain.schema import SystemMessage, HumanMessage
 from tabulate import tabulate
 import csv
 import io
+from afpi_context import load_schema_prompt, parse_few_shots_from_datos, default_afpi_few_shots
 
 load_dotenv()
 
 NEO4J_URI  = os.getenv("NEO4J_URI", "bolt://localhost:7687")
 NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
 NEO4J_PASS = os.getenv("NEO4J_PASS", "neo4j123")
+NEO4J_AUTH_DISABLED = os.getenv("NEO4J_AUTH_DISABLED", "").lower() in ("1", "true", "yes")
 # 👇 modelo que SÍ existe y entra en tu 1050 de 3GB (si no, probá qwen:3b-instruct o gemma:2b)
 MODEL      = os.getenv("OLLAMA_MODEL", "llama3:3b-instruct")
 
@@ -21,59 +23,15 @@ MODEL      = os.getenv("OLLAMA_MODEL", "llama3:3b-instruct")
 llm = ChatOllama(model=MODEL, temperature=0.0)
 
 # ---- Conexión Neo4j ----
-driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASS))
+_auth = None if NEO4J_AUTH_DISABLED or (not NEO4J_USER and not NEO4J_PASS) else (NEO4J_USER, NEO4J_PASS)
+driver = GraphDatabase.driver(NEO4J_URI, auth=_auth)
 
-# ---- Esquema del grafo ----
-SCHEMA = """
-NODES (labels, properties):
-- Course {code: STRING, name: STRING}
-- Area {name: STRING}
-- Semester {num: INTEGER}
-- Skill {name: STRING}
-- Category {name: STRING}
+SCHEME_PATH = os.path.join(os.path.dirname(__file__), "SCHEME.txt")
+DATOS_PATH = os.path.join(os.path.dirname(__file__), "DATOS.txt")
 
-RELATIONSHIPS (type):
-- (Course)-[:BELONGS_TO]->(Area)
-- (Course)-[:TAUGHT_IN]->(Semester)
-- (Course)-[:COVERS]->(Skill)
-- (Course)-[:IS_A]->(Category)
-- (Course)-[:PREREQ]->(Course)
-
-REGLAS:
-- Generá SOLO una consulta Cypher de lectura (MATCH/OPTIONAL MATCH/WHERE/RETURN/ORDER BY/LIMIT/UNWIND).
-- NO uses CREATE, MERGE, DELETE, DETACH, SET, DROP, CALL, LOAD, REMOVE, FOREACH, APOC, IMPORT.
-- Devolvé columnas con nombres descriptivos.
-- Devolvé SOLO un bloque ```cypher``` con la consulta (sin texto adicional).
-"""
-
-FEW_SHOTS = [
-# 1) Prerrequisitos de un curso (por nombre)
-("¿Qué materias tengo que aprobar antes de cursar Minería de Datos?",
-"""MATCH (pre:Course)-[:PREREQ]->(c:Course {name: "Minería de Datos"})
-RETURN pre.code AS code, pre.name AS name
-ORDER BY name"""),
-# 2) Cursos que cubren una competencia
-("¿Qué cursos cubren SQL y Modelado ER?",
-"""MATCH (c:Course)-[:COVERS]->(s:Skill)
-WHERE toLower(s.name) IN [toLower("SQL"), toLower("Modelado ER")]
-RETURN c.code AS code, c.name AS course, collect(DISTINCT s.name) AS skills
-ORDER BY course"""),
-# 3) Cursos por área
-("Mostrame cursos del área Bases de Datos y en qué semestre se dictan",
-"""MATCH (c:Course)-[:BELONGS_TO]->(a:Area {name: "Bases de Datos"})
-OPTIONAL MATCH (c)-[:TAUGHT_IN]->(sm:Semester)
-RETURN c.code AS code, c.name AS course, a.name AS area, sm.num AS semester
-ORDER BY semester, course"""),
-# 4) Semestre de un curso (por código)
-("¿En qué semestre se dicta IS-401?",
-"""MATCH (c:Course {code: "IS-401"})-[:TAUGHT_IN]->(sm:Semester)
-RETURN c.code AS code, c.name AS course, sm.num AS semester"""),
-# 5) Competencias de un curso
-("¿Qué competencias enseña Ingeniería de Software I?",
-"""MATCH (c:Course {name: "Ingeniería de Software I"})-[:COVERS]->(s:Skill)
-RETURN c.code AS code, c.name AS course, collect(s.name) AS skills
-ORDER BY course"""),
-]
+# Se inicializan dinámicamente a partir de SCHEME.txt y DATOS.txt
+SCHEMA: str = ""
+FEW_SHOTS: List[Tuple[str, str]] = []
 
 def extract_cypher(text: str) -> str:
     """
@@ -187,7 +145,19 @@ def ask(question: str):
     print(nl)
 
 if __name__ == "__main__":
-    print("NL→Cypher con LLM local (Ollama). Escribí tu pregunta o Ctrl+C para salir.\n")
+    # Preparar contexto dinámico
+    try:
+        SCHEMA = load_schema_prompt(SCHEME_PATH, driver)
+    except Exception:
+        SCHEMA = ""
+
+    try:
+        parsed = parse_few_shots_from_datos(DATOS_PATH)
+        FEW_SHOTS = parsed if parsed else default_afpi_few_shots()
+    except Exception:
+        FEW_SHOTS = default_afpi_few_shots()
+
+    print("NL→Cypher (AFPI) con LLM local (Ollama). Escribí tu pregunta o Ctrl+C para salir.\n")
     try:
         while True:
             q = input(">> ")

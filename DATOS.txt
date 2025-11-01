@@ -1,0 +1,510 @@
+// ============================================================================
+// DATOS DE PRUEBA EXTENDIDOS PARA AFPI (CORREGIDO)
+// Ejecutar DESPUÉS del script principal de creación del modelo
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// USUARIOS
+// ---------------------------------------------------------------------------
+MATCH (usrF:Frame {name:'Usuario'})
+MERGE (usr1:FrameInst {id:'user#maria'})-[:INSTANCE_OF]->(usrF)
+MERGE (usr2:FrameInst {id:'user#carlos'})-[:INSTANCE_OF]->(usrF);
+
+// Datos María
+MATCH (usr:FrameInst {id:'user#maria'}),(sl:Slot {name:'nombreYApellido'})
+MERGE (usr)-[r:HAS_VALUE]->(sl)
+SET r.slot='nombreYApellido', r.value='María González', r.ts=datetime();
+
+MATCH (usr:FrameInst {id:'user#maria'}),(sl:Slot {name:'correo'})
+MERGE (usr)-[r:HAS_VALUE]->(sl)
+SET r.slot='correo', r.value='maria.gonzalez@email.com', r.ts=datetime();
+
+// Datos Carlos
+MATCH (usr:FrameInst {id:'user#carlos'}),(sl:Slot {name:'nombreYApellido'})
+MERGE (usr)-[r:HAS_VALUE]->(sl)
+SET r.slot='nombreYApellido', r.value='Carlos Rodríguez', r.ts=datetime();
+
+MATCH (usr:FrameInst {id:'user#carlos'}),(sl:Slot {name:'correo'})
+MERGE (usr)-[r:HAS_VALUE]->(sl)
+SET r.slot='correo', r.value='carlos.rodriguez@email.com', r.ts=datetime();
+
+// ---------------------------------------------------------------------------
+// CATEGORÍAS
+// ---------------------------------------------------------------------------
+MATCH (catF:Frame {name:'Categoría'})
+MERGE (cat1:FrameInst {id:'cat#supermercado'})-[:INSTANCE_OF]->(catF)
+MERGE (cat2:FrameInst {id:'cat#transporte'})-[:INSTANCE_OF]->(catF)
+MERGE (cat3:FrameInst {id:'cat#entretenimiento'})-[:INSTANCE_OF]->(catF)
+MERGE (cat4:FrameInst {id:'cat#salud'})-[:INSTANCE_OF]->(catF)
+MERGE (cat5:FrameInst {id:'cat#servicios'})-[:INSTANCE_OF]->(catF)
+MERGE (cat6:FrameInst {id:'cat#educacion'})-[:INSTANCE_OF]->(catF)
+MERGE (cat7:FrameInst {id:'cat#cafecitos'})-[:INSTANCE_OF]->(catF);   // << agregado
+
+// Supermercado
+MATCH (cat:FrameInst {id:'cat#supermercado'}),(sl:Slot {name:'nombre'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='nombre', r.value='Supermercado', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#supermercado'}),(sl:Slot {name:'esencialidad'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='esencialidad', r.value='Alto', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#supermercado'}),(sl:Slot {name:'umbralDeGasto'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='umbralDeGasto', r.value=toFloat(50000), r.ts=datetime();
+
+// Transporte
+MATCH (cat:FrameInst {id:'cat#transporte'}),(sl:Slot {name:'nombre'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='nombre', r.value='Transporte', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#transporte'}),(sl:Slot {name:'esencialidad'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='esencialidad', r.value='Alto', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#transporte'}),(sl:Slot {name:'umbralDeGasto'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='umbralDeGasto', r.value=toFloat(25000), r.ts=datetime();
+
+// Entretenimiento
+MATCH (cat:FrameInst {id:'cat#entretenimiento'}),(sl:Slot {name:'nombre'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='nombre', r.value='Entretenimiento', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#entretenimiento'}),(sl:Slot {name:'esencialidad'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='esencialidad', r.value='Bajo', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#entretenimiento'}),(sl:Slot {name:'umbralDeGasto'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='umbralDeGasto', r.value=toFloat(15000), r.ts=datetime();
+
+// Salud
+MATCH (cat:FrameInst {id:'cat#salud'}),(sl:Slot {name:'nombre'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='nombre', r.value='Salud', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#salud'}),(sl:Slot {name:'esencialidad'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='esencialidad', r.value='Alto', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#salud'}),(sl:Slot {name:'umbralDeGasto'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='umbralDeGasto', r.value=toFloat(20000), r.ts=datetime();
+
+// Servicios
+MATCH (cat:FrameInst {id:'cat#servicios'}),(sl:Slot {name:'nombre'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='nombre', r.value='Servicios (luz, agua, internet)', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#servicios'}),(sl:Slot {name:'esencialidad'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='esencialidad', r.value='Alto', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#servicios'}),(sl:Slot {name:'umbralDeGasto'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='umbralDeGasto', r.value=toFloat(30000), r.ts=datetime();
+
+// Educación
+MATCH (cat:FrameInst {id:'cat#educacion'}),(sl:Slot {name:'nombre'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='nombre', r.value='Educación', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#educacion'}),(sl:Slot {name:'esencialidad'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='esencialidad', r.value='Medio', r.ts=datetime();
+MATCH (cat:FrameInst {id:'cat#educacion'}),(sl:Slot {name:'umbralDeGasto'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='umbralDeGasto', r.value=toFloat(40000), r.ts=datetime();
+
+// Cafecitos (opcional: umbral propio)
+MATCH (cat:FrameInst {id:'cat#cafecitos'}),(sl:Slot {name:'nombre'})
+MERGE (cat)-[r:HAS_VALUE]->(sl)
+SET r.slot='nombre', r.value='Cafecitos', r.ts=datetime();
+
+// ---------------------------------------------------------------------------
+// OBJETIVOS DE AHORRO
+// ---------------------------------------------------------------------------
+MATCH (objF:Frame {name:'Objetivo de Ahorro'})
+MERGE (obj1:FrameInst {id:'obj#vacaciones_maria'})-[:INSTANCE_OF]->(objF)
+MERGE (obj2:FrameInst {id:'obj#auto_carlos'})-[:INSTANCE_OF]->(objF)
+MERGE (obj3:FrameInst {id:'obj#fondo_emergencia_maria'})-[:INSTANCE_OF]->(objF);
+
+// Vacaciones María
+MATCH (obj:FrameInst {id:'obj#vacaciones_maria'}),(sl:Slot {name:'montoMeta'})
+MERGE (obj)-[r:HAS_VALUE]->(sl)
+SET r.slot='montoMeta', r.value=toFloat(150000), r.ts=datetime();
+MATCH (obj:FrameInst {id:'obj#vacaciones_maria'}),(sl:Slot {name:'fechaLímite'})
+MERGE (obj)-[r:HAS_VALUE]->(sl)
+SET r.slot='fechaLímite', r.value=date('2025-12-15'), r.ts=datetime();
+MATCH (obj:FrameInst {id:'obj#vacaciones_maria'}),(sl:Slot {name:'progreso'})
+MERGE (obj)-[r:HAS_VALUE]->(sl)
+SET r.slot='progreso', r.value=toFloat(35.5), r.ts=datetime();
+
+// Auto Carlos
+MATCH (obj:FrameInst {id:'obj#auto_carlos'}),(sl:Slot {name:'montoMeta'})
+MERGE (obj)-[r:HAS_VALUE]->(sl)
+SET r.slot='montoMeta', r.value=toFloat(500000), r.ts=datetime();
+MATCH (obj:FrameInst {id:'obj#auto_carlos'}),(sl:Slot {name:'fechaLímite'})
+MERGE (obj)-[r:HAS_VALUE]->(sl)
+SET r.slot='fechaLímite', r.value=date('2026-06-30'), r.ts=datetime();
+MATCH (obj:FrameInst {id:'obj#auto_carlos'}),(sl:Slot {name:'progreso'})
+MERGE (obj)-[r:HAS_VALUE]->(sl)
+SET r.slot='progreso', r.value=toFloat(22.8), r.ts=datetime();
+
+// Fondo Emergencia María
+MATCH (obj:FrameInst {id:'obj#fondo_emergencia_maria'}),(sl:Slot {name:'montoMeta'})
+MERGE (obj)-[r:HAS_VALUE]->(sl)
+SET r.slot='montoMeta', r.value=toFloat(200000), r.ts=datetime();
+MATCH (obj:FrameInst {id:'obj#fondo_emergencia_maria'}),(sl:Slot {name:'fechaLímite'})
+MERGE (obj)-[r:HAS_VALUE]->(sl)
+SET r.slot='fechaLímite', r.value=date('2025-11-30'), r.ts=datetime();
+MATCH (obj:FrameInst {id:'obj#fondo_emergencia_maria'}),(sl:Slot {name:'progreso'})
+MERGE (obj)-[r:HAS_VALUE]->(sl)
+SET r.slot='progreso', r.value=toFloat(68.0), r.ts=datetime();
+
+// Relaciones Usuario-Objetivos
+MATCH (usr:FrameInst {id:'user#maria'}),(obj:FrameInst {id:'obj#vacaciones_maria'})
+MERGE (usr)-[:TIENE]->(obj);
+MATCH (usr:FrameInst {id:'user#maria'}),(obj:FrameInst {id:'obj#fondo_emergencia_maria'})
+MERGE (usr)-[:TIENE]->(obj);
+MATCH (usr:FrameInst {id:'user#carlos'}),(obj:FrameInst {id:'obj#auto_carlos'})
+MERGE (usr)-[:TIENE]->(obj);
+
+// ---------------------------------------------------------------------------
+// MOVIMIENTOS - MARÍA (Octubre 2025)
+// ---------------------------------------------------------------------------
+MATCH (movF:Frame {name:'Movimiento'})
+MERGE (m1:FrameInst {id:'mov#2025-10-01#maria#1'})-[:INSTANCE_OF]->(movF)
+MERGE (m2:FrameInst {id:'mov#2025-10-03#maria#2'})-[:INSTANCE_OF]->(movF)
+MERGE (m3:FrameInst {id:'mov#2025-10-05#maria#3'})-[:INSTANCE_OF]->(movF)
+MERGE (m4:FrameInst {id:'mov#2025-10-08#maria#4'})-[:INSTANCE_OF]->(movF)
+MERGE (m5:FrameInst {id:'mov#2025-10-10#maria#5'})-[:INSTANCE_OF]->(movF)
+MERGE (m6:FrameInst {id:'mov#2025-10-12#maria#6'})-[:INSTANCE_OF]->(movF)
+MERGE (m7:FrameInst {id:'mov#2025-10-15#maria#7'})-[:INSTANCE_OF]->(movF)
+MERGE (m8:FrameInst {id:'mov#2025-10-18#maria#8'})-[:INSTANCE_OF]->(movF)
+MERGE (m9:FrameInst {id:'mov#2025-10-20#maria#9'})-[:INSTANCE_OF]->(movF)
+MERGE (m10:FrameInst {id:'mov#2025-10-25#maria#10'})-[:INSTANCE_OF]->(movF);
+
+// Movimiento 1: Ingreso Salario
+MATCH (m:FrameInst {id:'mov#2025-10-01#maria#1'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Ingreso', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-01#maria#1'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-01'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-01#maria#1'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Salario mensual', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-01#maria#1'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(250000), r.ts=datetime();
+
+// Movimiento 2: Supermercado
+MATCH (m:FrameInst {id:'mov#2025-10-03#maria#2'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-03#maria#2'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-03'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-03#maria#2'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Compra semanal en supermercado', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-03#maria#2'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(18500), r.ts=datetime();
+
+// Movimiento 3: Cafés
+MATCH (m:FrameInst {id:'mov#2025-10-05#maria#3'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-05#maria#3'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-05'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-05#maria#3'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Cafés durante la semana', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-05#maria#3'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(3200), r.ts=datetime();
+
+// Movimiento 4: Transporte
+MATCH (m:FrameInst {id:'mov#2025-10-08#maria#4'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-08#maria#4'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-08'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-08#maria#4'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Carga SUBE', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-08#maria#4'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(8000), r.ts=datetime();
+
+// Movimiento 5: Entretenimiento
+MATCH (m:FrameInst {id:'mov#2025-10-10#maria#5'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-10#maria#5'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-10'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-10#maria#5'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Cine con amigos', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-10#maria#5'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(5500), r.ts=datetime();
+
+// Movimiento 6: Servicios
+MATCH (m:FrameInst {id:'mov#2025-10-12#maria#6'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-12#maria#6'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-12'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-12#maria#6'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Pago luz e internet', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-12#maria#6'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(22000), r.ts=datetime();
+
+// Movimiento 7: Salud
+MATCH (m:FrameInst {id:'mov#2025-10-15#maria#7'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-15#maria#7'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-15'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-15#maria#7'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Medicamentos farmacia', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-15#maria#7'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(12500), r.ts=datetime();
+
+// Movimiento 8: Supermercado
+MATCH (m:FrameInst {id:'mov#2025-10-18#maria#8'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-18#maria#8'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-18'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-18#maria#8'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Compra supermercado', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-18#maria#8'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(21000), r.ts=datetime();
+
+// Movimiento 9: Entretenimiento
+MATCH (m:FrameInst {id:'mov#2025-10-20#maria#9'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-20#maria#9'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-20'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-20#maria#9'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Cena restaurante', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-20#maria#9'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(15000), r.ts=datetime();
+
+// Movimiento 10: Cafés
+MATCH (m:FrameInst {id:'mov#2025-10-25#maria#10'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-25#maria#10'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-25'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-25#maria#10'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Café y medialunas', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-25#maria#10'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(2800), r.ts=datetime();
+
+// Relaciones de movimientos de María
+MATCH (usr:FrameInst {id:'user#maria'}), (m:FrameInst)
+WHERE m.id STARTS WITH 'mov#' AND m.id CONTAINS '#maria#'
+MERGE (usr)-[:REALIZA]->(m);
+
+MATCH (m:FrameInst {id:'mov#2025-10-03#maria#2'}),(cat:FrameInst {id:'cat#supermercado'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+MATCH (m:FrameInst {id:'mov#2025-10-18#maria#8'}),(cat:FrameInst {id:'cat#supermercado'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+
+MATCH (m:FrameInst {id:'mov#2025-10-05#maria#3'}),(cat:FrameInst {id:'cat#cafecitos'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+MATCH (m:FrameInst {id:'mov#2025-10-25#maria#10'}),(cat:FrameInst {id:'cat#cafecitos'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+
+MATCH (m:FrameInst {id:'mov#2025-10-08#maria#4'}),(cat:FrameInst {id:'cat#transporte'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+
+MATCH (m:FrameInst {id:'mov#2025-10-10#maria#5'}),(cat:FrameInst {id:'cat#entretenimiento'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+MATCH (m:FrameInst {id:'mov#2025-10-20#maria#9'}),(cat:FrameInst {id:'cat#entretenimiento'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+
+MATCH (m:FrameInst {id:'mov#2025-10-12#maria#6'}),(cat:FrameInst {id:'cat#servicios'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+
+MATCH (m:FrameInst {id:'mov#2025-10-15#maria#7'}),(cat:FrameInst {id:'cat#salud'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+
+// ---------------------------------------------------------------------------
+// MOVIMIENTOS - CARLOS (Octubre 2025)  << CORREGIDO: reutiliza (movF)
+// ---------------------------------------------------------------------------
+MATCH (movF:Frame {name:'Movimiento'})
+WITH movF, [
+  'mov#2025-10-01#carlos#1',
+  'mov#2025-10-04#carlos#2',
+  'mov#2025-10-07#carlos#3',
+  'mov#2025-10-10#carlos#4',
+  'mov#2025-10-15#carlos#5',
+  'mov#2025-10-20#carlos#6'
+] AS ids
+UNWIND ids AS cid
+MERGE (c:FrameInst {id:cid})-[:INSTANCE_OF]->(movF);
+
+// Carlos Mov 1: Ingreso
+MATCH (m:FrameInst {id:'mov#2025-10-01#carlos#1'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Ingreso', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-01#carlos#1'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-01'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-01#carlos#1'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Salario mensual', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-01#carlos#1'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(320000), r.ts=datetime();
+
+// Carlos Mov 2: Educación
+MATCH (m:FrameInst {id:'mov#2025-10-04#carlos#2'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-04#carlos#2'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-04'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-04#carlos#2'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Curso online programación', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-04#carlos#2'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(28000), r.ts=datetime();
+
+// Carlos Mov 3: Transporte
+MATCH (m:FrameInst {id:'mov#2025-10-07#carlos#3'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-07#carlos#3'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-07'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-07#carlos#3'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Combustible', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-07#carlos#3'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(35000), r.ts=datetime();
+
+// Carlos Mov 4: Supermercado
+MATCH (m:FrameInst {id:'mov#2025-10-10#carlos#4'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-10#carlos#4'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-10'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-10#carlos#4'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Compras del mes', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-10#carlos#4'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(45000), r.ts=datetime();
+
+// Carlos Mov 5: Entretenimiento
+MATCH (m:FrameInst {id:'mov#2025-10-15#carlos#5'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-15#carlos#5'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-15'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-15#carlos#5'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Netflix y Spotify', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-15#carlos#5'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(6500), r.ts=datetime();
+
+// Carlos Mov 6: Servicios
+MATCH (m:FrameInst {id:'mov#2025-10-20#carlos#6'}),(sl:Slot {name:'tipoDeMovimiento'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='tipoDeMovimiento', r.value='Gasto', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-20#carlos#6'}),(sl:Slot {name:'fecha'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='fecha', r.value=date('2025-10-20'), r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-20#carlos#6'}),(sl:Slot {name:'descripcion'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='descripcion', r.value='Expensas departamento', r.ts=datetime();
+MATCH (m:FrameInst {id:'mov#2025-10-20#carlos#6'}),(sl:Slot {name:'monto'})
+MERGE (m)-[r:HAS_VALUE]->(sl) SET r.slot='monto', r.value=toFloat(38000), r.ts=datetime();
+
+// Relaciones Carlos
+MATCH (usr:FrameInst {id:'user#carlos'}), (m:FrameInst)
+WHERE m.id STARTS WITH 'mov#' AND m.id CONTAINS '#carlos#'
+MERGE (usr)-[:REALIZA]->(m);
+
+MATCH (m:FrameInst {id:'mov#2025-10-04#carlos#2'}),(cat:FrameInst {id:'cat#educacion'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+MATCH (m:FrameInst {id:'mov#2025-10-07#carlos#3'}),(cat:FrameInst {id:'cat#transporte'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+MATCH (m:FrameInst {id:'mov#2025-10-10#carlos#4'}),(cat:FrameInst {id:'cat#supermercado'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+MATCH (m:FrameInst {id:'mov#2025-10-15#carlos#5'}),(cat:FrameInst {id:'cat#entretenimiento'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+MATCH (m:FrameInst {id:'mov#2025-10-20#carlos#6'}),(cat:FrameInst {id:'cat#servicios'})
+MERGE (m)-[:PERTENECE_A]->(cat);
+
+// ---------------------------------------------------------------------------
+// RECOMENDACIONES
+// ---------------------------------------------------------------------------
+MATCH (recF:Frame {name:'Recomendación'})
+MERGE (r1:FrameInst {id:'rec#maria#2025-10-26#1'})-[:INSTANCE_OF]->(recF)
+MERGE (r2:FrameInst {id:'rec#maria#2025-10-26#2'})-[:INSTANCE_OF]->(recF)
+MERGE (r3:FrameInst {id:'rec#carlos#2025-10-26#1'})-[:INSTANCE_OF]->(recF);
+
+// Recomendación 1 María: Alerta cafés
+MATCH (r:FrameInst {id:'rec#maria#2025-10-26#1'}),(sl:Slot {name:'descripcion'})
+MERGE (r)-[rel:HAS_VALUE]->(sl)
+SET rel.slot='descripcion', 
+    rel.value='Has gastado $6000 en cafés este mes, superando tu umbral de $8000 en 75%. Considera preparar café en casa para ahorrar hacia tus vacaciones.', 
+    rel.ts=datetime();
+MATCH (r:FrameInst {id:'rec#maria#2025-10-26#1'}),(sl:Slot {name:'fecha'})
+MERGE (r)-[rel:HAS_VALUE]->(sl)
+SET rel.slot='fecha', rel.value=date('2025-10-26'), rel.ts=datetime();
+MATCH (r:FrameInst {id:'rec#maria#2025-10-26#1'}),(sl:Slot {name:'tipo_recomendacion'})
+MERGE (r)-[rel:HAS_VALUE]->(sl)
+SET rel.slot='tipo_recomendacion', rel.value='Alerta', rel.ts=datetime();
+
+// Recomendación 2 María: Sugerencia entretenimiento
+MATCH (r:FrameInst {id:'rec#maria#2025-10-26#2'}),(sl:Slot {name:'descripcion'})
+MERGE (r)-[rel:HAS_VALUE]->(sl)
+SET rel.slot='descripcion', 
+    rel.value='Has gastado $20500 en entretenimiento. Podrías reducir $10000 y acercarte más rápido a tu meta de vacaciones.', 
+    rel.ts=datetime();
+MATCH (r:FrameInst {id:'rec#maria#2025-10-26#2'}),(sl:Slot {name:'fecha'})
+MERGE (r)-[rel:HAS_VALUE]->(sl)
+SET rel.slot='fecha', rel.value=date('2025-10-26'), rel.ts=datetime();
+MATCH (r:FrameInst {id:'rec#maria#2025-10-26#2'}),(sl:Slot {name:'tipo_recomendacion'})
+MERGE (r)-[rel:HAS_VALUE]->(sl)
+SET rel.slot='tipo_recomendacion', rel.value='Sugerencia', rel.ts=datetime();
+
+// Recomendación 3 Carlos: Sugerencia transporte
+MATCH (r:FrameInst {id:'rec#carlos#2025-10-26#1'}),(sl:Slot {name:'descripcion'})
+MERGE (r)-[rel:HAS_VALUE]->(sl)
+SET rel.slot='descripcion', 
+    rel.value='El gasto en transporte está por encima del promedio. Considera usar transporte público algunas veces para acelerar el ahorro del auto.', 
+    rel.ts=datetime();
+MATCH (r:FrameInst {id:'rec#carlos#2025-10-26#1'}),(sl:Slot {name:'fecha'})
+MERGE (r)-[rel:HAS_VALUE]->(sl)
+SET rel.slot='fecha', rel.value=date('2025-10-26'), rel.ts=datetime();
+MATCH (r:FrameInst {id:'rec#carlos#2025-10-26#1'}),(sl:Slot {name:'tipo_recomendacion'})
+MERGE (r)-[rel:HAS_VALUE]->(sl)
+SET rel.slot='tipo_recomendacion', rel.value='Sugerencia', rel.ts=datetime();
+
+// Relaciones de recomendaciones
+MATCH (usr:FrameInst {id:'user#maria'}),(r:FrameInst {id:'rec#maria#2025-10-26#1'})
+MERGE (usr)-[:RECIBE]->(r);
+MATCH (usr:FrameInst {id:'user#maria'}),(r:FrameInst {id:'rec#maria#2025-10-26#2'})
+MERGE (usr)-[:RECIBE]->(r);
+MATCH (usr:FrameInst {id:'user#carlos'}),(r:FrameInst {id:'rec#carlos#2025-10-26#1'})
+MERGE (usr)-[:RECIBE]->(r);
+
+MATCH (r:FrameInst {id:'rec#maria#2025-10-26#1'}),(cat:FrameInst {id:'cat#cafecitos'})
+MERGE (r)-[:BASADO_EN]->(cat);
+MATCH (r:FrameInst {id:'rec#maria#2025-10-26#2'}),(cat:FrameInst {id:'cat#entretenimiento'})
+MERGE (r)-[:BASADO_EN]->(cat);
+MATCH (r:FrameInst {id:'rec#carlos#2025-10-26#1'}),(cat:FrameInst {id:'cat#transporte'})
+MERGE (r)-[:BASADO_EN]->(cat);
+
+MATCH (r:FrameInst {id:'rec#maria#2025-10-26#1'}),(obj:FrameInst {id:'obj#vacaciones_maria'})
+MERGE (r)-[:DIRIGIDA_A]->(obj);
+MATCH (r:FrameInst {id:'rec#maria#2025-10-26#2'}),(obj:FrameInst {id:'obj#vacaciones_maria'})
+MERGE (r)-[:DIRIGIDA_A]->(obj);
+MATCH (r:FrameInst {id:'rec#carlos#2025-10-26#1'}),(obj:FrameInst {id:'obj#auto_carlos'})
+MERGE (r)-[:DIRIGIDA_A]->(obj);
+
+--------------------------------------------------------------------
+// CONSULTAS DE EJEMPLO PARA LANGCHAIN
+// ---------------------------------------------------------------------------
+
+// Ver todos los movimientos de un usuario con sus categorías
+// MATCH (u:FrameInst {id:'user#maria'})-[:REALIZA]->(m:FrameInst)-[:INSTANCE_OF]->(mf:Frame {name:'Movimiento'})
+// OPTIONAL MATCH (m)-[:PERTENECE_A]->(cat:FrameInst)-[:INSTANCE_OF]->(:Frame {name:'Categoría'})
+// OPTIONAL MATCH (m)-[:HAS_VALUE]->(sl:Slot)
+// RETURN m.id, sl.name, m, cat
+// ORDER BY m.id;
+
+// Calcular gasto total por categoría de un usuario
+// MATCH (u:FrameInst {id:'user#maria'})-[:REALIZA]->(m:FrameInst)-[:PERTENECE_A]->(cat:FrameInst)
+// MATCH (cat)-[:HAS_VALUE]->(slNom:Slot {name:'nombre'})
+// MATCH (m)-[hvTipo:HAS_VALUE]->(slTipo:Slot {name:'tipoDeMovimiento'})
+// WHERE hvTipo.value = 'Gasto'
+// MATCH (m)-[hvMonto:HAS_VALUE]->(slMonto:Slot {name:'monto'})
+// RETURN slNom, cat.id, SUM(hvMonto.value) as total_gastado
+// ORDER BY total_gastado DESC;
+
+// Ver objetivos de un usuario con su progreso
+// MATCH (u:FrameInst {id:'user#maria'})-[:TIENE]->(obj:FrameInst)-[:INSTANCE_OF]->(:Frame {name:'Objetivo de Ahorro'})
+// MATCH (obj)-[hvMeta:HAS_VALUE]->(slMeta:Slot {name:'montoMeta'})
+// MATCH (obj)-[hvProg:HAS_VALUE]->(slProg:Slot {name:'progreso'})
+// MATCH (obj)-[hvFecha:HAS_VALUE]->(slFecha:Slot {name:'fechaLímite'})
+// RETURN obj.id, hvMeta.value as meta, hvProg.value as progreso_porcentaje, hvFecha.value as fecha_limite;
+
+// Ver recomendaciones de un usuario
+// MATCH (u:FrameInst {id:'user#maria'})-[:RECIBE]->(rec:FrameInst)-[:INSTANCE_OF]->(:Frame {name:'Recomendación'})
+// MATCH (rec)-[hvDesc:HAS_VALUE]->(slDesc:Slot {name:'descripcion'})
+// MATCH (rec)-[hvTipo:HAS_VALUE]->(slTipo:Slot {name:'tipo_recomendacion'})
+// OPTIONAL MATCH (rec)-[:BASADO_EN]->(cat:FrameInst)
+// OPTIONAL MATCH (cat)-[hvCat:HAS_VALUE]->(slCat:Slot {name:'nombre'})
+// RETURN rec.id, hvDesc.value as descripcion, hvTipo.value as tipo, hvCat.value as categoria;
+
+// Resumen financiero completo de un usuario
+// MATCH (u:FrameInst {id:'user#maria'})
+// OPTIONAL MATCH (u)-[:REALIZA]->(m:FrameInst)-[hvTipo:HAS_VALUE]->(:Slot {name:'tipoDeMovimiento'})
+// OPTIONAL MATCH (m)-[hvMonto:HAS_VALUE]->(:Slot {name:'monto'})
+// WITH u, 
+//      SUM(CASE WHEN hvTipo.value = 'Ingreso' THEN hvMonto.value ELSE 0 END) as total_ingresos,
+//      SUM(CASE WHEN hvTipo.value = 'Gasto' THEN hvMonto.value ELSE 0 END) as total_gastos
+// OPTIONAL MATCH (u)-[:TIENE]->(obj:FrameInst)-[:INSTANCE_OF]->(:Frame {name:'Objetivo de Ahorro'})
+// RETURN u.id, total_ingresos, total_gastos, (total_ingresos - total_gastos) as balance, COUNT(obj) as objetivos_activos;

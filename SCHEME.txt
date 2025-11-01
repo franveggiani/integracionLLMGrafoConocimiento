@@ -1,0 +1,171 @@
+// ============================================================================
+// ESQUEMA / METAMODELO PARA AFPI
+// Ejecutar ANTES del script de datos
+// Neo4j 5.x
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// [Opcional] Limpiar la base si estás en un entorno de pruebas
+// (Solo si querés arrancar de cero; si ya tenés cosas en producción, NO lo hagas)
+// ---------------------------------------------------------------------------
+// MATCH (n) DETACH DELETE n;
+// DROP CONSTRAINT frame_name_unique        IF EXISTS;
+// DROP CONSTRAINT slot_name_unique         IF EXISTS;
+// DROP CONSTRAINT frameinst_id_unique      IF EXISTS;
+// DROP CONSTRAINT has_value_value_exists   IF EXISTS;
+// DROP CONSTRAINT has_value_slot_exists    IF EXISTS;
+
+// ---------------------------------------------------------------------------
+// Constraints de unicidad (crean índice implícito)
+// ---------------------------------------------------------------------------
+CREATE CONSTRAINT frame_name_unique IF NOT EXISTS
+FOR (f:Frame) REQUIRE f.name IS UNIQUE;
+
+CREATE CONSTRAINT slot_name_unique IF NOT EXISTS
+FOR (s:Slot) REQUIRE s.name IS UNIQUE;
+
+CREATE CONSTRAINT frameinst_id_unique IF NOT EXISTS
+FOR (fi:FrameInst) REQUIRE fi.id IS UNIQUE;
+
+// ---------------------------------------------------------------------------
+// [Opcional, recomendado] Existencia de propiedades en relaciones HAS_VALUE
+// (evita tener relaciones HAS_VALUE sin 'value' o sin 'slot')
+// ---------------------------------------------------------------------------
+CREATE CONSTRAINT has_value_value_exists IF NOT EXISTS
+FOR ()-[r:HAS_VALUE]-() REQUIRE r.value IS NOT NULL;
+
+CREATE CONSTRAINT has_value_slot_exists IF NOT EXISTS
+FOR ()-[r:HAS_VALUE]-() REQUIRE r.slot IS NOT NULL;
+
+// ---------------------------------------------------------------------------
+// Metamodelo: Frames (tipos) y Slots (atributos)
+// ---------------------------------------------------------------------------
+// Frames usados por tu seed
+UNWIND [
+  'Usuario',
+  'Categoría',
+  'Movimiento',
+  'Objetivo de Ahorro',
+  'Recomendación'
+] AS fname
+MERGE (:Frame {name: fname});
+
+// Slots usados por tu seed
+UNWIND [
+  // Usuario
+  'nombreYApellido','correo',
+  // Categoría
+  'nombre','esencialidad','umbralDeGasto',
+  // Movimiento
+  'tipoDeMovimiento','fecha','descripcion','monto',
+  // Objetivo de Ahorro
+  'montoMeta','fechaLímite','progreso',
+  // Recomendación
+  'tipo_recomendacion'
+] AS sname
+MERGE (:Slot {name: sname});
+
+// ---------------------------------------------------------------------------
+// (Opcional) Declarar catálogo de categorías específicas que usás en datos
+// (solo para evitar typos luego)
+// ---------------------------------------------------------------------------
+MATCH (catF:Frame {name:'Categoría'})
+WITH catF, [
+  'cat#supermercado','cat#transporte','cat#entretenimiento',
+  'cat#salud','cat#servicios','cat#educacion','cat#cafecitos'
+] AS catIds
+UNWIND catIds AS cid
+MERGE (:FrameInst {id: cid})-[:INSTANCE_OF]->(catF);
+
+
+// APOC TRIGGERS
+
+CALL apoc.trigger.removeAll();
+
+CALL apoc.trigger.add(
+  'movimiento_recalcula_categoria',
+  '
+  WITH $createdRelationships AS cr, $assignedRelationshipProperties AS arp
+  WITH [r IN cr  WHERE type(r) = "HAS_VALUE" AND r.slot IN ["monto","fecha","tipoDeMovimiento"]] +
+       [r IN arp WHERE type(r) = "HAS_VALUE" AND r.slot IN ["monto","fecha","tipoDeMovimiento"]] AS rels
+  WHERE size(rels) > 0
+  UNWIND rels AS r
+  WITH DISTINCT startNode(r) AS mov
+  MATCH (mov:FrameInst)-[:INSTANCE_OF]->(:Frame {name:"Movimiento"})
+  MATCH (mov)-[:PERTENECE_A]->(cat:FrameInst)-[:INSTANCE_OF]->(:Frame {name:"Categoría"})
+  WITH cat
+  MATCH (movs:FrameInst)-[:INSTANCE_OF]->(:Frame {name:"Movimiento"})
+  MATCH (movs)-[:PERTENECE_A]->(cat)
+  MATCH (movs)-[montoRel:HAS_VALUE]->(:Slot {name:"monto"})
+  OPTIONAL MATCH (movs)-[fechaRel:HAS_VALUE]->(:Slot {name:"fecha"})
+  OPTIONAL MATCH (movs)-[tipoRel:HAS_VALUE]->(:Slot {name:"tipoDeMovimiento"})
+  WITH cat, toFloat(montoRel.value) AS monto, coalesce(fechaRel.value, date()) AS fechaMov, coalesce(tipoRel.value,"Gasto") AS tipo
+  WHERE tipo="Gasto" AND fechaMov >= date() - duration({days:30})
+  WITH cat, count(*) AS freq, coalesce(sum(monto),0.0) AS nivel
+  MERGE (slF:Slot {name:"frecuencia"}) MERGE (cat)-[hvF:HAS_VALUE]->(slF)
+  SET hvF.slot="frecuencia", hvF.value=freq, hvF.ts=datetime()
+  MERGE (slN:Slot {name:"nivelDeGasto"}) MERGE (cat)-[hvN:HAS_VALUE]->(slN)
+  SET hvN.slot="nivelDeGasto", hvN.value=nivel, hvN.ts=datetime()
+  ',
+  {phase:'after'}
+);
+
+CALL apoc.trigger.add(
+  'categoria_supera_umbral',
+  '
+  WITH ($createdRelationships + $assignedRelationshipProperties) AS rels
+  WITH [r IN rels WHERE type(r) = "HAS_VALUE" AND r.slot IN ["nivelDeGasto","umbralDeGasto"]] AS cand
+  WHERE size(cand) > 0
+  UNWIND cand AS r
+  WITH DISTINCT startNode(r) AS cat
+  MATCH (cat:FrameInst)-[:INSTANCE_OF]->(:Frame {name:"Categoría"})
+  MATCH (slNivel:Slot {name:"nivelDeGasto"})
+  MATCH (slUmbral:Slot {name:"umbralDeGasto"})
+  OPTIONAL MATCH (cat)-[n:HAS_VALUE]->(slNivel)  WHERE coalesce(n.slot,"nivelDeGasto")="nivelDeGasto"
+  OPTIONAL MATCH (cat)-[u:HAS_VALUE]->(slUmbral) WHERE coalesce(u.slot,"umbralDeGasto")="umbralDeGasto"
+  WITH cat, coalesce(toFloat(n.value),0.0) AS nivel, coalesce(toFloat(u.value),0.0) AS umbral
+  WHERE nivel > umbral AND umbral > 0
+  MATCH (recF:Frame {name:"Recomendación"})
+  MERGE (rec:FrameInst {id: apoc.create.uuid()})-[:INSTANCE_OF]->(recF)
+  MERGE (slDesc:Slot {name:"descripcion"}) MERGE (rec)-[rDesc:HAS_VALUE]->(slDesc)
+  SET rDesc.slot="descripcion", rDesc.value="Alerta: Se superó el umbral de gasto de la categoría", rDesc.ts=datetime()
+  MERGE (slFecha:Slot {name:"fecha"}) MERGE (rec)-[rFecha:HAS_VALUE]->(slFecha)
+  SET rFecha.slot="fecha", rFecha.value=date(), rFecha.ts=datetime()
+  MERGE (slTipo:Slot {name:"tipo_recomendacion"}) MERGE (rec)-[rTipo:HAS_VALUE]->(slTipo)
+  SET rTipo.slot="tipo_recomendacion", rTipo.value="Alerta", rTipo.ts=datetime()
+  MERGE (rec)-[:GENERATED_BY]->(cat)
+  ',
+  {phase:'after'}
+);
+
+CALL apoc.trigger.add(
+  'movimiento_recalcula_objetivo',
+  '
+  WITH $createdRelationships AS cr
+  WITH [r IN cr WHERE type(r) = "AFECTA"] AS rels
+  WHERE size(rels) > 0
+  UNWIND rels AS r
+  WITH DISTINCT endNode(r) AS obj
+  MATCH (obj:FrameInst)-[:INSTANCE_OF]->(:Frame {name:"Objetivo de Ahorro"})
+  MATCH (m:FrameInst)-[:INSTANCE_OF]->(:Frame {name:"Movimiento"})
+  MATCH (m)-[:AFECTA]->(obj)
+  OPTIONAL MATCH (m)-[tipoRel:HAS_VALUE]->(:Slot {name:"tipoDeMovimiento"})
+  OPTIONAL MATCH (m)-[monRel:HAS_VALUE]->(:Slot {name:"monto"})
+  WITH obj, sum(CASE WHEN coalesce(tipoRel.value,"Ingreso")="Ingreso" THEN coalesce(toFloat(monRel.value),0.0) ELSE 0.0 END) AS acumulado
+  MATCH (slMeta:Slot {name:"montoMeta"})
+  MATCH (slLim :Slot {name:"fechaLímite"})
+  OPTIONAL MATCH (obj)-[hvMeta:HAS_VALUE]->(slMeta) WHERE coalesce(hvMeta.slot,"montoMeta")="montoMeta"
+  OPTIONAL MATCH (obj)-[hvLim :HAS_VALUE]->(slLim)  WHERE coalesce(hvLim.slot,"fechaLímite")="fechaLímite"
+  WITH obj, acumulado, coalesce(toFloat(hvMeta.value),0.0) AS meta, coalesce(hvLim.value, date()) AS fLim
+  WITH obj, CASE WHEN meta>0 THEN toFloat(100.0*acumulado/meta) ELSE 0.0 END AS progreso, duration.between(date(), fLim).days AS urgenciaDias
+  MERGE (slProg:Slot {name:"progreso"}) MERGE (obj)-[hvP:HAS_VALUE]->(slProg)
+  SET hvP.slot="progreso", hvP.value=round(CASE WHEN progreso>100 THEN 100 ELSE progreso END, 2), hvP.ts=datetime()
+  MERGE (slUrg:Slot {name:"urgencia"}) MERGE (obj)-[hvU:HAS_VALUE]->(slUrg)
+  SET hvU.slot="urgencia", hvU.value=urgenciaDias, hvU.ts=datetime()
+  ',
+  {phase:'after'}
+);
+
+CALL apoc.trigger.show()
+YIELD name, paused, query
+RETURN name, paused, left(query, 200) AS preview;
