@@ -46,13 +46,22 @@ Para validar que el dataset está cargado y la conexión es correcta:
 ```
 Ejecuta 3 consultas de ejemplo directamente y muestra tablas.
 
-## Ejecutar el asistente NL → Cypher
+## Ejecutar el asistente (modo agente + NL → Cypher)
 1. Asegurate que Ollama esté activo (`ollama serve`) y que el modelo exista (`ollama run <modelo>` al menos una vez).
 2. Ejecutá:
 ```bash
 .venv/bin/python nl2cypher.py
 ```
-3. Escribí preguntas en español (“Listá los últimos 10 movimientos de user#maria”, “Resumen financiero de user#carlos”, etc.).
+   - Este modo crea un agente LangChain con herramientas:
+     - `consultar_grafo_afpi`: preguntas NL→Cypher como antes.
+     - `clasificar_movimiento_nuevo`: invoca el clasificador de `pi4_nlp_ia.py` para etiquetar automáticamente la categoría de un movimiento cuando el usuario quiere registrarlo.
+     - `registrar_movimiento`: inserta un movimiento usando un JSON con los campos necesarios.
+     - `registrar_objetivo_ahorro`: crea objetivos de ahorro con un JSON similar.
+   - El agente detecta automáticamente si tu prompt implica “registrar/crear/agregar” y solo entonces habilita las herramientas de escritura; para preguntas como “quiero saber mis objetivos” usa exclusivamente la herramienta de consulta.
+3. Si preferís el flujo tradicional sin agente, usá `--legacy`:
+```bash
+.venv/bin/python nl2cypher.py --legacy
+```
 
 ## Estructura del código
 - `nl2cypher.py`: bucle interactivo NL→Cypher; seguridad de solo lectura; ejecución y respuesta breve.
@@ -72,3 +81,16 @@ Ejecuta 3 consultas de ejemplo directamente y muestra tablas.
 - Esquema/datos: corré `SCHEME.txt` y `DATOS.txt` en la misma DB que usás por Bolt.
 - LLM/modelo: si el modelo no existe, cambiá `OLLAMA_MODEL` o ejecutá `ollama pull <modelo>`.
 - Consultas bloqueadas: si el modelo genera verbos prohibidos, reformulá la pregunta más específica (solo lectura).
+### Ejemplos rápidos de inserts vía agente
+Cuando el usuario pide registrar algo, el agente arma el JSON y llama a la herramienta apropiada. También podés hacerlo manualmente describiendo el JSON:
+
+- Movimiento:
+  ```text
+  Usa registrar_movimiento con:
+  {"user_id":"user#maria","tipo":"Gasto","fecha":"2025-11-05","descripcion":"Cena con amigos","monto":18500,"categoria_id":"cat#entretenimiento"}
+  ```
+- Objetivo:
+  ```text
+  Usa registrar_objetivo_ahorro con:
+  {"user_id":"user#maria","nombre":"Computadora nueva","monto_meta":450000,"fecha_limite":"2026-03-31","progreso":12.5}
+  ```
